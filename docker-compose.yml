@@ -21,7 +21,7 @@ services:
       - "80:80"
 
     volumes:
-      - /var/lib/git/eny/events:/var/www/html/wp-content/plugins/eny_events
+      - /var/lib/git/eny/events/eny_events:/var/www/html/wp-content/plugins/eny_events
       - wp-data:/var/www/html
 
     networks:

@@ -5,8 +5,6 @@ services:
 
   # WP Dev Container [build]
   wordpress:
-    env_file: dev.env
-
     depends_on:
       - db-dev
     
@@ -30,8 +28,6 @@ services:
       - wp-dev-network
 
   mariadb:
-    env_file: dev.env
-
     build:
       context: ./db
       dockerfile: dockerfile
@@ -45,19 +41,24 @@ services:
       - "3306:3306"
 
     environment:
-      - MYSQL_ROOT_PASSWORD=$ROOT_PASS
-      - MYSQL_DATABASE=$DB_NAME
-      - MYSQL_USER=$DB_USER
-      - MYSQL_PASSWORD=$DB_PASS
+      MYSQL_ROOT_PASSWORD: $ROOT_PASS
+      MYSQL_DATABASE: $DB_NAME
+      MYSQL_USER: $DB_USER
+      MYSQL_PASSWORD: $DB_PASS
 
     volumes:
       - db-data:/var/lib/mysql
     networks:
       - wp-dev-network
 
+  wpcli:
+    # https://stackoverflow.com/questions/50999848/how-to-run-wp-cli-in-docker-compose-yml
+    image: wordpress:cli
+    user: xfs
+    volumes:
+      - wp-data:/var/www/html
+
   adminer:
-    env_file: dev.env
-    
     depends_on:
       - mariadb
 
@@ -74,8 +75,8 @@ services:
       - wp-dev-network
 
 volumes:
-  db-data:
   wp-data:
+  db-data:
 
 # Network using 10.10.10.0 - 255
 #   dhcp for internal network 10.10.10.0-15

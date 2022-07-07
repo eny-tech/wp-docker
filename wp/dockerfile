@@ -1,0 +1,14 @@
+# https://hub.docker.com/_/wordpress/
+FROM wordpress:latest
+# might want to look at php 8.1 and or apache + fixed version...
+
+RUN apt-get update
+
+# Push PHP configuration
+# --chown=gedefili:gedefili ?
+COPY php.conf.ini /usr/local/etc/php/conf.d/php.ini
+
+# XDebug (thinking abouty using apt-get over pecl)
+RUN pecl install xdebug && docker-php-ext-enable xdebug
+COPY xdebug.conf.ini /usr/local/etc/php/conf.d/99-xdebug.ini
+

@@ -1,0 +1,90 @@
+version: "3"
+# https://docs.docker.com/compose/compose-file/compose-versioning/
+
+services:
+
+  # WP Dev Container [build]
+  wordpress:
+    env_file: dev.env
+
+    depends_on:
+      - db-dev
+    
+    build:
+      context: ./wp
+      dockerfile: dockerfile
+    
+    image: wp_dev:2.0.0
+    container_name: wp-dev
+
+    restart: unless-stopped
+
+    ports:
+      - "80:80"
+
+    volumes:
+      - /var/lib/git/eny/events:/var/www/html/wp-content/plugins/eny_events
+      - wp-data:/var/www/html
+
+    networks:
+      - wp-dev-network
+
+  mariadb:
+    env_file: dev.env
+
+    build:
+      context: ./db
+      dockerfile: dockerfile
+
+    image: db-dev:1.0.0
+    container_name: db-dev
+
+    restart: unless-stopped
+
+    ports:
+      - "3306:3306"
+
+    environment:
+      - MYSQL_ROOT_PASSWORD=$ROOT_PASS
+      - MYSQL_DATABASE=$DB_NAME
+      - MYSQL_USER=$DB_USER
+      - MYSQL_PASSWORD=$DB_PASS
+
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - wp-dev-network
+
+  adminer:
+    env_file: dev.env
+    
+    depends_on:
+      - mariadb
+
+    image: adminer:latest
+    container_name: adminer
+
+    environment:
+      - ADMINER_DEFAULT_SERVER=mariadb
+
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    networks:
+      - wp-dev-network
+
+volumes:
+  db-data:
+  wp-data:
+
+# Network using 10.10.10.0 - 255
+#   dhcp for internal network 10.10.10.0-15
+#   gateway at 10.10.10.254 (leave the broadcast ip alone)
+networks:
+  wp-dev-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.10.0/24
+          ip_range: 10.10.10.0/28
+          gateway: 10.10.10.254

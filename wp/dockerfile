@@ -12,3 +12,10 @@ COPY php.conf.ini /usr/local/etc/php/conf.d/php.ini
 RUN pecl install xdebug && docker-php-ext-enable xdebug
 COPY xdebug.conf.ini /usr/local/etc/php/conf.d/99-xdebug.ini
 
+# Composer
+# https://newbedev.com/how-to-install-php-composer-inside-a-docker-container
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# https://github.com/JulienBreux/phpunit-docker/blob/master/7.4.0/Dockerfile
+RUN composer require "phpunit/phpunit:^9" --prefer-source --no-interaction
+RUN composer require "phpunit/php-invoker" --prefer-source --no-interaction

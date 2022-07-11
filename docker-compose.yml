@@ -2,6 +2,7 @@ version: "3"
 # https://docs.docker.com/compose/compose-file/compose-versioning/
 
 services:
+  # Ref: https://github.com/kassambara/wordpress-docker-compose/blob/master/docker-compose.yml
 
   # WP Dev Container [build]
   wordpress:
@@ -31,7 +32,7 @@ services:
     volumes:
       - /var/lib/git/eny/events/eny_events/eny-events:/var/www/html/wp-content/plugins/eny-events
       - /var/lib/git/eny/query/eny_querystr/eny-querystr:/var/www/html/wp-content/plugins/eny-querystr
-      - wp-data:/var/www/html
+      - ./wordpress:/var/www/html
 
     networks:
       - wp-dev-network
@@ -56,16 +57,18 @@ services:
       MYSQL_PASSWORD: $DB_PASS
 
     volumes:
-      - db-data:/var/lib/mysql
+      - ./mysql:/var/lib/mysql
     networks:
       - wp-dev-network
 
   wpcli:
-    # https://stackoverflow.com/questions/50999848/how-to-run-wp-cli-in-docker-compose-yml
-    image: wordpress:cli
-    user: xfs
+    build:
+      context: ./wpcli
+      dockerfile: dockerfile
+    container_name: wpcli_dev
     volumes:
-      - wp-data:/var/www/html
+      - ./wordpress:/var/www/html
+    working_dir: /var/www/html
 
   adminer:
     depends_on:
@@ -82,6 +85,19 @@ services:
       - "8080:8080"
     networks:
       - wp-dev-network
+
+  healthcheck:
+    image: wpcli
+    build: ./wpcli/
+    container_name: wp_healthcheck
+    command: sh -c "/wait"
+    environment:
+      - WAIT_HOSTS=mysql:3306, wordpress:80
+      - WAIT_BEFORE_HOSTS=${WAIT_BEFORE_HOSTS:-30}
+      - WAIT_AFTER_HOSTS=${WAIT_AFTER_HOSTS:-15}
+      - WAIT_HOSTS_TIMEOUT=${WAIT_HOSTS_TIMEOUT:-300}
+      - WAIT_SLEEP_INTERVAL=${WAIT_SLEEP_INTERVAL:-30}
+      - WAIT_HOST_CONNECT_TIMEOUT=${WAIT_HOST_CONNECT_TIMEOUT:-30}
 
 volumes:
   wp-data:

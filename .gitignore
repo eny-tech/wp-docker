@@ -351,3 +351,8 @@ MigrationBackup/
 
 # WP-DEV Ignores
 *.env
+wordpress/*
+!wordpress/.keep
+
+mysql/*
+!mysql/.keep

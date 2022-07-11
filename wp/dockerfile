@@ -25,3 +25,8 @@ COPY xdebug.conf.ini /usr/local/etc/php/conf.d/99-xdebug.ini
 #1 install wp cli?
 #2 setup wp ?
 #3 
+
+# Bew Plugin:
+
+# curl in wp client
+# run scaffoldr...  or copy test files...

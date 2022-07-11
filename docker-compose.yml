@@ -30,8 +30,8 @@ services:
       WORDPRESS_DEBUG: 1
 
     volumes:
-      - /var/lib/git/eny/events/eny_events/eny-events:/var/www/html/wp-content/plugins/eny-events
-      - /var/lib/git/eny/query/eny_querystr/eny-querystr:/var/www/html/wp-content/plugins/eny-querystr
+      - /var/lib/git/eny/eny_events/eny-events:/var/www/html/wp-content/plugins/eny-events
+      - /var/lib/git/eny/eny_querystr/eny-invited:/var/www/html/wp-content/plugins/eny-invited
       - ./wordpress:/var/www/html
 
   mariadb:

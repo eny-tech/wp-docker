@@ -17,3 +17,11 @@ COPY xdebug.conf.ini /usr/local/etc/php/conf.d/99-xdebug.ini
 #    export COMPOSER_MEMORY_LIMIT=-1 && \
 #    composer self-update --1 && \
 #    composer install --no-interaction --optimize-autoloader
+
+# let repo pull version...
+# after things are up, run tests causes phpunit to pull
+
+# flow
+#1 install wp cli?
+#2 setup wp ?
+#3 

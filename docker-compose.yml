@@ -26,16 +26,13 @@ services:
       WORDPRESS_DB_NAME: $DB_NAME
       WORDPRESS_DB_USER: $DB_USER
       WORDPRESS_DB_PASSWORD: $DB_PASS
-      WORDPRESS_TABLE_PREFIX: $DB_PREFIX
+      WORDPRESS_TABLE_PREFIX: $WP_DB_PREFIX
       WORDPRESS_DEBUG: 1
 
     volumes:
       - /var/lib/git/eny/events/eny_events/eny-events:/var/www/html/wp-content/plugins/eny-events
       - /var/lib/git/eny/query/eny_querystr/eny-querystr:/var/www/html/wp-content/plugins/eny-querystr
       - ./wordpress:/var/www/html
-
-    networks:
-      - wp-dev-network
 
   mariadb:
     build:
@@ -58,17 +55,15 @@ services:
 
     volumes:
       - ./mysql:/var/lib/mysql
-    networks:
-      - wp-dev-network
 
-  wpcli:
-    build:
-      context: ./wpcli
-      dockerfile: dockerfile
-    container_name: wpcli_dev
-    volumes:
-      - ./wordpress:/var/www/html
-    working_dir: /var/www/html
+  # wpcli:
+  #   build:
+  #     context: ./wpcli
+  #     dockerfile: dockerfile
+  #   container_name: wpcli_dev
+  #   volumes:
+  #     - ./wordpress:/var/www/html
+  #   working_dir: /var/www/html
 
   adminer:
     depends_on:
@@ -83,30 +78,16 @@ services:
     restart: unless-stopped
     ports:
       - "8080:8080"
-    networks:
-      - wp-dev-network
 
-  healthcheck:
-    image: wpcli
-    build: ./wpcli/
-    container_name: wp_healthcheck
-    command: sh -c "/wait"
-    environment:
-      - WAIT_HOSTS=mysql:3306, wordpress:80
-      - WAIT_BEFORE_HOSTS=${WAIT_BEFORE_HOSTS:-30}
-      - WAIT_AFTER_HOSTS=${WAIT_AFTER_HOSTS:-15}
-      - WAIT_HOSTS_TIMEOUT=${WAIT_HOSTS_TIMEOUT:-300}
-      - WAIT_SLEEP_INTERVAL=${WAIT_SLEEP_INTERVAL:-30}
-      - WAIT_HOST_CONNECT_TIMEOUT=${WAIT_HOST_CONNECT_TIMEOUT:-30}
-
-# Network using 10.10.10.0 - 255
-#   dhcp for internal network 10.10.10.0-15
-#   gateway at 10.10.10.254 (leave the broadcast ip alone)
-networks:
-  wp-dev-network:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 10.10.10.0/24
-          ip_range: 10.10.10.0/28
-          gateway: 10.10.10.254
+  # healthcheck:
+  #   image: wpcli
+  #   build: ./wpcli/
+  #   container_name: wp_healthcheck
+  #   command: sh -c "/wait"
+  #   environment:
+  #     - WAIT_HOSTS=mysql:3306, wordpress:80
+  #     - WAIT_BEFORE=${WAIT_BEFORE_HOSTS:-30}
+  #     - WAIT_AFTER=${WAIT_AFTER_HOSTS:-15}
+  #     - WAIT_TIMEOUT=${WAIT_HOSTS_TIMEOUT:-300}
+  #     - WAIT_SLEEP_INTERVAL=${WAIT_SLEEP_INTERVAL:-30}
+  #     - WAIT_HOST_CONNECT_TIMEOUT=${WAIT_HOST_CONNECT_TIMEOUT:-30}

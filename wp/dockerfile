@@ -2,7 +2,11 @@
 FROM wordpress:latest
 # might want to look at php 8.1 and or apache + fixed version...
 
-RUN apt-get update
+RUN apt-get update && i apt-get install -y \
+    php-xml \
+    zip unzip php-zip \
+    p7zip-full p7zip-rar \
+    php-mbstring
 
 # Push PHP configuration
 # --chown=gedefili:gedefili ?
@@ -12,11 +16,17 @@ COPY php.conf.ini /usr/local/etc/php/conf.d/php.ini
 RUN pecl install xdebug && docker-php-ext-enable xdebug
 COPY xdebug.conf.ini /usr/local/etc/php/conf.d/99-xdebug.ini
 
+# Composer Install (https://getcomposer.org/doc/00-intro.md#locally)
+COPY --from=composer/composer /usr/bin/composer /usr/bin/composer
+RUN composer self-update
+
+
 # Install Composer /  run this on host machine not dev wp container
-#RUN curl -sS https://getcomposer.org/installer | php -- --check && \
-#    export COMPOSER_MEMORY_LIMIT=-1 && \
-#    composer self-update --1 && \
-#    composer install --no-interaction --optimize-autoloader
+# RUN curl -sS https://getcomposer.org/installer | php -- --check && \
+#     export COMPOSER_MEMORY_LIMIT=-1 && \
+#     composer self-update --1 && \
+#     composer install --no-interaction --optimize-autoloader
+
 
 # let repo pull version...
 # after things are up, run tests causes phpunit to pull

@@ -32,6 +32,7 @@ services:
     volumes:
       - /var/lib/git/eny/eny_events/eny-events:/var/www/html/wp-content/plugins/eny-events
       - /var/lib/git/eny/eny_querystr/eny-invited:/var/www/html/wp-content/plugins/eny-invited
+      - /var/lib/git/eny/nmi-elite:/var/www/html/wp-content/plugins/eny-ppb
       - ./wordpress:/var/www/html
 
   mariadb:

@@ -1,5 +1,4 @@
 #!/bin/sh
-# https://vaneyckt.io/posts/safer_bash_scripts_with_set_euxo_pipefail/
 set -euo pipefail
 
 # Based on wordpress:cli entrypoint
@@ -15,11 +14,4 @@ fi
 # documenation of the subcommand is shown
 if wp --path=/dev/null help "$1" > /dev/null 2>&1; then
 	set -- wp "$@"
-fi
-
-# Execute aliases in the make file or directly the provided command
-if [ "$1" == "install" ] || [ "$1" == "configure" ]; then
-  make -f /scripts/Makefile $1
-else
-  exec "$@"
 fi

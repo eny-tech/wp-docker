@@ -1,13 +1,15 @@
 # https://hub.docker.com/_/wordpress/
-FROM wordpress:6.0.1-php7.4-apache
-# might want to look at php 8.1 and or apache + fixed version...
+FROM wordpress:php8.1-apache
 
-RUN apt-get update -y && apt-get install -y curl && apt-get clean -y
-#RUN docker-php-ext-install php-curl
-#RUN docker-php-ext-install php-xml
-#RUN apt-get install zip unzip 
-#RUN docker-php-ext-install php-zip
-#RUN docker-php-ext-install php-mbstring
+RUN apt-get update -y 
+RUN apt-get install -y curl make zip unzip
+
+RUN apt-get clean -y
+# RUN docker-php-ext-install php-curl
+# RUN docker-php-ext-install php-xml
+
+# RUN docker-php-ext-install php-zip
+# RUN docker-php-ext-install php-mbstring
 
 # Push PHP configuration
 # --chown=gedefili:gedefili ?
@@ -21,23 +23,6 @@ COPY xdebug.conf.ini /usr/local/etc/php/conf.d/99-xdebug.ini
 COPY --from=composer/composer /usr/bin/composer /usr/bin/composer
 RUN composer self-update
 
-
-# Install Composer /  run this on host machine not dev wp container
-# RUN curl -sS https://getcomposer.org/installer | php -- --check && \
-#     export COMPOSER_MEMORY_LIMIT=-1 && \
-#     composer self-update --1 && \
-#     composer install --no-interaction --optimize-autoloader
-
-
-# let repo pull version...
-# after things are up, run tests causes phpunit to pull
-
-# flow
-#1 install wp cli?
-#2 setup wp ?
-#3 
-
-# Bew Plugin:
-
-# curl in wp client
-# run scaffoldr...  or copy test files...
+# Install PHP Unit
+RUN composer global require phpunit/phpunit:9.*
+COPY composer.json /var/www/html/composer.json

@@ -13,7 +13,7 @@ services:
       context: ./wp
       dockerfile: dockerfile
     
-    command: sh -c "composer install"
+#    command: sh -c "composer install"
     
     image: wp_dev:2.0.0
     container_name: wp-dev
@@ -37,6 +37,7 @@ services:
       - /var/lib/git/repo/eny_events:/var/www/html/wp-content/plugins/eny-events
       - /var/lib/git/eny/eny_querystr/eny-invited:/var/www/html/wp-content/plugins/eny-invited
       - /var/lib/git/eny/nmi-elite:/var/www/html/wp-content/plugins/eny-ppb
+      - ./wp/composer.json:/var/www/html/composer.json
       - ./wordpress:/var/www/html
 
   mariadb:

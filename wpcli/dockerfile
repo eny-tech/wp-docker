@@ -1,6 +1,15 @@
 FROM wordpress:cli
 
 USER root
+RUN apk update
+RUN apk add --no-cache bash
+RUN apk add --no-cache shadow
+
+ENV USER=gedefili
+ENV UID=1000
+ENV GID=1000
+
+RUN useradd -ms /bin/bash gedefili
 
 # Make docker-compose wait for container dependencies be ready
 # Add the wait script to the image

@@ -1,6 +1,10 @@
 # https://hub.docker.com/_/wordpress/
 FROM wordpress:php8.1-apache
 
+USER root
+
+RUN useradd -ms /bin/bash gedefili
+
 RUN apt-get update -y 
 RUN apt-get install -y curl make zip unzip
 
@@ -14,9 +18,11 @@ RUN apt-get clean -y
 # Push PHP configuration
 # --chown=gedefili:gedefili ?
 COPY php.conf.ini /usr/local/etc/php/conf.d/php.ini
+#COPY composer.json /var/www/html/composer.json
 
 # XDebug (thinking abouty using apt-get over pecl)
-RUN pecl install xdebug && docker-php-ext-enable xdebug
+RUN pecl install xdebug 
+RUN docker-php-ext-enable xdebug
 COPY xdebug.conf.ini /usr/local/etc/php/conf.d/99-xdebug.ini
 
 # Composer Install (https://getcomposer.org/doc/00-intro.md#locally)
@@ -25,4 +31,3 @@ RUN composer self-update
 
 # Install PHP Unit
 RUN composer global require phpunit/phpunit:9.*
-COPY composer.json /var/www/html/composer.json

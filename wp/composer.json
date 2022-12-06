@@ -27,9 +27,15 @@
             ]
         }
     ],
+    "config": {
+        "allow-plugins": {
+          "composer/installers": true
+        }
+    },
     "require": {
         "php": "^8.0",
-        "wpackagist-plugin/woocommerce":">=7.1.0"
+        "wpackagist-plugin/woocommerce":">=7.1.0",
+        "wpackagist-plugin/formidable":">=5.5.4"
     },
     "extra": {
         "installer-paths": {

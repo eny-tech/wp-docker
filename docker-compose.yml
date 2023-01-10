@@ -12,7 +12,12 @@ services:
     build:
       context: ./wp
       dockerfile: dockerfile
-    
+      args:
+        USER_NAME: $DB_USER
+        USER_ID: $DB_USER_UID
+        GROUP_ID: $DB_USER_GID
+        USER_PATH: $DB_USER_PATH
+
 #    command: sh -c "composer install"
     
     image: wp_dev:2.0.0
@@ -40,12 +45,20 @@ services:
       - ./wp/composer.json:/var/www/html/composer.json
       - ./wordpress:/var/www/html
 
+    networks:
+      - network-dev
+
   mariadb:
     build:
       context: ./db
       dockerfile: dockerfile
+      args:
+        USER_NAME: $DB_USER
+        USER_ID: $DB_USER_UID
+        GROUP_ID: $DB_USER_GID
+        USER_PATH: $DB_USER_PATH
 
-    image: db-dev:1.0.0
+    image: db-dev:2.0.0
     container_name: db-dev
 
     restart: unless-stopped
@@ -62,15 +75,29 @@ services:
     volumes:
       - ./mysql:/var/lib/mysql
 
+    networks:
+      - network-dev
+
   wpcli:
     build:
       context: ./wpcli
       dockerfile: dockerfile
+      args:
+        USER_NAME: $DB_USER
+        USER_ID: $DB_USER_UID
+        GROUP_ID: $DB_USER_GID
+        USER_PATH: $DB_USER_PATH
+        
+    image: wpcli-dev:2.0.0
     container_name: wpcli_dev
     
     user: "1000:1000"
 
     volumes:
+      - /var/lib/git/repo/eny_events:/var/www/html/wp-content/plugins/eny-events
+      - /var/lib/git/eny/eny_querystr/eny-invited:/var/www/html/wp-content/plugins/eny-invited
+      - /var/lib/git/eny/nmi-elite:/var/www/html/wp-content/plugins/eny-ppb
+      - ./wp/composer.json:/var/www/html/composer.json
       - ./wordpress:/var/www/html
     
     working_dir: /var/www/html
@@ -81,12 +108,15 @@ services:
       WORDPRESS_DB_USER: $DB_USER
       WORDPRESS_DB_PASSWORD: $DB_PASS
 
+    networks:
+      - network-dev
+
   adminer:
     depends_on:
       - mariadb
 
     image: adminer:latest
-    container_name: adminer
+    container_name: adminer_dev
 
     environment:
       - ADMINER_DEFAULT_SERVER=mariadb
@@ -94,11 +124,10 @@ services:
     restart: unless-stopped
     ports:
       - "8080:8080"
-  
-  healthcheck:
-    image: wpcli
-    build: ./wpcli/
-    container_name: healthcheck_dev
-    command: sh -c "/wait"
-    environment:
-      - WAIT_HOSTS=mariadb:3306, wordpress:80
+    
+    networks:
+      - network-dev
+
+networks:
+  network-dev:
+    external: true

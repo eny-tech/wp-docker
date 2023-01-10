@@ -3,8 +3,6 @@ FROM wordpress:php8.1-apache
 
 USER root
 
-RUN useradd -ms /bin/bash gedefili
-
 RUN apt-get update -y 
 RUN apt-get install -y curl make zip unzip
 
@@ -29,5 +27,15 @@ COPY xdebug.conf.ini /usr/local/etc/php/conf.d/99-xdebug.ini
 COPY --from=composer/composer /usr/bin/composer /usr/bin/composer
 RUN composer self-update
 
+# Add global composer dir to path (installed phpunit from global)
+# should make this more universal by getting this path via composer and then adding it
+ENV PATH="${PATH}:/home/gedefili/.composer/vendor/bin"
+
 # Install PHP Unit
-RUN composer global require phpunit/phpunit:9.*
+RUN composer global require --dev phpunit/phpunit:9.*
+
+RUN useradd -ms /bin/bash -u 1000 gedefili
+RUN usermod -a -G root gedefili
+RUN chmod -R g+rw /var/www/html/wp-content
+
+

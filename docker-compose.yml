@@ -39,9 +39,8 @@ services:
       WORDPRESS_DEBUG: 1
 
     volumes:
-      - /var/lib/git/repo/eny_events:/var/www/html/wp-content/plugins/eny-events
-      - /var/lib/git/eny/eny_querystr/eny-invited:/var/www/html/wp-content/plugins/eny-invited
-      - /var/lib/git/eny/nmi-elite:/var/www/html/wp-content/plugins/eny-ppb
+      - /var/lib/git/eny/eny-event-api:/var/www/html/wp-content/plugins/eny-events
+      - /var/lib/git/eny/eny_invited/eny-invited:/var/www/html/wp-content/plugins/eny-invited
       - ./wp/composer.json:/var/www/html/composer.json
       - ./wordpress:/var/www/html
 
@@ -93,20 +92,17 @@ services:
     
     user: "1000:1000"
 
-    volumes:
-      - /var/lib/git/repo/eny_events:/var/www/html/wp-content/plugins/eny-events
-      - /var/lib/git/eny/eny_querystr/eny-invited:/var/www/html/wp-content/plugins/eny-invited
-      - /var/lib/git/eny/nmi-elite:/var/www/html/wp-content/plugins/eny-ppb
-      - ./wp/composer.json:/var/www/html/composer.json
-      - ./wordpress:/var/www/html
+    volumes_from:
+      - wordpress
     
+    links:
+      - mariadb
+
     working_dir: /var/www/html
-    
-    environment:
-      WORDPRESS_DB_HOST: mariadb:3306
-      WORDPRESS_DB_NAME: $DB_NAME
-      WORDPRESS_DB_USER: $DB_USER
-      WORDPRESS_DB_PASSWORD: $DB_PASS
+
+    entrypoint: wp
+
+    command: "--info"
 
     networks:
       - network-dev

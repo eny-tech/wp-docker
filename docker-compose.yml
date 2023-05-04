@@ -40,7 +40,7 @@ services:
 
     volumes:
       - /var/lib/git/eny/eny-event-api:/var/www/html/wp-content/plugins/eny-events
-      - /var/lib/git/eny/eny_invited/eny-invited:/var/www/html/wp-content/plugins/eny-invited
+      - /var/lib/git/eny/eny_invited:/var/www/html/wp-content/plugins/eny-invited
       - ./wp/composer.json:/var/www/html/composer.json
       - ./wordpress:/var/www/html
 
@@ -99,6 +99,12 @@ services:
       - mariadb
 
     working_dir: /var/www/html
+
+    environment:
+      WORDPRESS_DB_HOST: mariadb:3306
+      WORDPRESS_DB_NAME: $DB_NAME
+      WORDPRESS_DB_USER: $DB_USER
+      WORDPRESS_DB_PASSWORD: $DB_PASS
 
     entrypoint: wp
 

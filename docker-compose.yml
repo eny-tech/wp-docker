@@ -2,37 +2,60 @@ version: "3"
 # https://docs.docker.com/compose/compose-file/compose-versioning/
 
 services:
+  # Ref: https://github.com/kassambara/wordpress-docker-compose/blob/master/docker-compose.yml
 
   # WP Dev Container [build]
   wordpress:
     depends_on:
-      - db-dev
-    
+      - mariadb
+
     build:
       context: ./wp
       dockerfile: dockerfile
-    
+      args:
+        USER_NAME: $DB_USER
+        USER_ID: $DB_USER_UID
+        GROUP_ID: $DB_USER_GID
+        USER_PATH: $DB_USER_PATH
+
+    #    command: sh -c "composer install"
+
     image: wp_dev:2.0.0
     container_name: wp-dev
+
+    user: "1000:1000"
 
     restart: unless-stopped
 
     ports:
       - "80:80"
 
+    environment:
+      WORDPRESS_DB_HOST: mariadb:3306
+      WORDPRESS_DB_NAME: $DB_NAME
+      WORDPRESS_DB_USER: $DB_USER
+      WORDPRESS_DB_PASSWORD: $DB_PASS
+      WORDPRESS_TABLE_PREFIX: $WP_DB_PREFIX
+      WORDPRESS_DEBUG: 1
+
     volumes:
-      - /var/lib/git/eny/events:/var/www/html/wp-content/plugins/eny_events
-      - wp-data:/var/www/html
+      - ./wp/composer.json:/var/www/html/composer.json
+      - ./wordpress:/var/www/html
 
     networks:
-      - wp-dev-network
+      - network-dev
 
   mariadb:
     build:
       context: ./db
       dockerfile: dockerfile
+      args:
+        USER_NAME: $DB_USER
+        USER_ID: $DB_USER_UID
+        GROUP_ID: $DB_USER_GID
+        USER_PATH: $DB_USER_PATH
 
-    image: db-dev:1.0.0
+    image: db-dev:2.0.0
     container_name: db-dev
 
     restart: unless-stopped
@@ -47,23 +70,53 @@ services:
       MYSQL_PASSWORD: $DB_PASS
 
     volumes:
-      - db-data:/var/lib/mysql
+      - ./mysql:/var/lib/mysql
+
     networks:
-      - wp-dev-network
+      - network-dev
 
   wpcli:
-    # https://stackoverflow.com/questions/50999848/how-to-run-wp-cli-in-docker-compose-yml
-    image: wordpress:cli
-    user: xfs
-    volumes:
-      - wp-data:/var/www/html
+    build:
+      context: ./wpcli
+      dockerfile: dockerfile
+      args:
+        USER_NAME: $DB_USER
+        USER_ID: $DB_USER_UID
+        GROUP_ID: $DB_USER_GID
+        USER_PATH: $DB_USER_PATH
+
+    image: wpcli-dev:2.0.0
+    container_name: wpcli_dev
+
+    user: "1000:1000"
+
+    volumes_from:
+      - wordpress
+
+    links:
+      - mariadb
+
+    working_dir: /var/www/html
+
+    environment:
+      WORDPRESS_DB_HOST: mariadb:3306
+      WORDPRESS_DB_NAME: $DB_NAME
+      WORDPRESS_DB_USER: $DB_USER
+      WORDPRESS_DB_PASSWORD: $DB_PASS
+
+    entrypoint: wp
+
+    command: "--info"
+
+    networks:
+      - network-dev
 
   adminer:
     depends_on:
       - mariadb
 
     image: adminer:latest
-    container_name: adminer
+    container_name: adminer_dev
 
     environment:
       - ADMINER_DEFAULT_SERVER=mariadb
@@ -71,21 +124,9 @@ services:
     restart: unless-stopped
     ports:
       - "8080:8080"
+
     networks:
-      - wp-dev-network
+      - network-dev
 
-volumes:
-  wp-data:
-  db-data:
-
-# Network using 10.10.10.0 - 255
-#   dhcp for internal network 10.10.10.0-15
-#   gateway at 10.10.10.254 (leave the broadcast ip alone)
 networks:
-  wp-dev-network:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 10.10.10.0/24
-          ip_range: 10.10.10.0/28
-          gateway: 10.10.10.254
+  network-dev:

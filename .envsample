@@ -1,0 +1,11 @@
+DB_USER=geoff
+DB_USER_UID=1000
+DB_USER_GID=1000
+DB_USER_PATH=/home/geoff
+
+DB_NAME=wpdb
+DB_PASS=<?>
+
+WP_DB_PREFIX=eny_
+
+ROOT_PASS=<?>

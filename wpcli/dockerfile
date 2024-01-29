@@ -1,0 +1,13 @@
+FROM wordpress:cli
+
+# SUDO
+USER root
+
+RUN apk update
+RUN apk add --no-cache bash
+RUN apk add --no-cache shadow
+
+RUN chmod 0640 /etc/shadow
+
+RUN useradd -ms /bin/bash -u 1000 -G www-data geoff
+RUN usermod -a -G root geoff

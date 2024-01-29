@@ -8,7 +8,7 @@ services:
   wordpress:
     depends_on:
       - mariadb
-    
+
     build:
       context: ./wp
       dockerfile: dockerfile
@@ -18,8 +18,8 @@ services:
         GROUP_ID: $DB_USER_GID
         USER_PATH: $DB_USER_PATH
 
-#    command: sh -c "composer install"
-    
+    #    command: sh -c "composer install"
+
     image: wp_dev:2.0.0
     container_name: wp-dev
 
@@ -39,8 +39,6 @@ services:
       WORDPRESS_DEBUG: 1
 
     volumes:
-      - /var/lib/git/eny/eny-event-api:/var/www/html/wp-content/plugins/eny-events
-      - /var/lib/git/eny/eny_invited:/var/www/html/wp-content/plugins/eny-invited
       - ./wp/composer.json:/var/www/html/composer.json
       - ./wordpress:/var/www/html
 
@@ -66,7 +64,7 @@ services:
       - "3306:3306"
 
     environment:
-      MYSQL_ROOT_PASSWORD: $ROOT_PASS 
+      MYSQL_ROOT_PASSWORD: $ROOT_PASS
       MYSQL_DATABASE: $DB_NAME
       MYSQL_USER: $DB_USER
       MYSQL_PASSWORD: $DB_PASS
@@ -86,15 +84,15 @@ services:
         USER_ID: $DB_USER_UID
         GROUP_ID: $DB_USER_GID
         USER_PATH: $DB_USER_PATH
-        
+
     image: wpcli-dev:2.0.0
     container_name: wpcli_dev
-    
+
     user: "1000:1000"
 
     volumes_from:
       - wordpress
-    
+
     links:
       - mariadb
 
@@ -126,10 +124,9 @@ services:
     restart: unless-stopped
     ports:
       - "8080:8080"
-    
+
     networks:
       - network-dev
 
 networks:
   network-dev:
-    external: true

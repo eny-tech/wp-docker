@@ -2,4 +2,4 @@ FROM mariadb:latest
 RUN apt-get update -y 
 RUN apt-get clean -y
 
-RUN useradd -ms /bin/bash -u 1000 -G www-data gedefili
+RUN useradd -ms /bin/bash -u 1000 -G www-data geoff

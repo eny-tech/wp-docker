@@ -9,5 +9,5 @@ RUN apk add --no-cache shadow
 
 RUN chmod 0640 /etc/shadow
 
-RUN useradd -ms /bin/bash -u 1000 -G www-data gedefili
-RUN usermod -a -G root gedefili
+RUN useradd -ms /bin/bash -u 1000 -G www-data geoff
+RUN usermod -a -G root geoff

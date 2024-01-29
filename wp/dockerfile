@@ -1,5 +1,5 @@
 # https://hub.docker.com/_/wordpress/
-FROM wordpress:6.2.0-php8.0-apache
+FROM wordpress:latest
 
 USER root
 
@@ -29,13 +29,11 @@ RUN composer self-update
 
 # Add global composer dir to path (installed phpunit from global)
 # should make this more universal by getting this path via composer and then adding it
-ENV PATH="${PATH}:/home/gedefili/.composer/vendor/bin"
+ENV PATH="${PATH}:/home/geoff/.composer/vendor/bin"
 
 # Install PHP Unit
 RUN composer global require --dev phpunit/phpunit:9.*
 
-RUN useradd -ms /bin/bash -u 1000 gedefili
-RUN usermod -a -G root gedefili
+RUN useradd -ms /bin/bash -u 1000 geoff
+RUN usermod -a -G root geoff
 RUN chmod -R g+rw /var/www/html/wp-content
-
-

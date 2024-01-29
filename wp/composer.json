@@ -1,50 +1,50 @@
 {
-    "name": "eny/wp-docker",
-    "type": "project",
-    "description": "Setup the needed plugins for Wordpress / WooCommerce Dev.",
-    "version": "1.0.0",
-    "keywords": [
-        "package",
-        "dependency",
-        "autoload"
-    ],
-    "homepage": "https://eny.tech/",
-    "license": "GPL-3.0-or-later",
-    "authors": [
-        {
-            "name": "Geoff DeFilipii",
-            "email": "geoff@eny.tech",
-            "role": "Developer"
-        }
-    ],
-    "repositories":[
-        {
-            "type":"composer",
-            "url":"https://wpackagist.org",
-            "only":[
-                "wpackagist-plugin/*",
-                "wpackagist-theme/*"
-            ]
-        }
-    ],
-    "config": {
-        "allow-plugins": {
-          "composer/installers": true
-        }
-    },
-    "require": {
-        "php": "^8.0",
-        "wpackagist-plugin/woocommerce":">=7.1.0",
-        "wpackagist-plugin/formidable":">=5.5.4"
-    },
-    "extra": {
-        "installer-paths": {
-            "wp-content/plugins/{$name}/": [
-                "type:wordress-plugin"
-            ]
-        }
-    },
-    "support": {
-        "issues": "https://eny.tech/wordpress/issues"
+  "name": "eny/wp-docker",
+  "type": "project",
+  "description": "Setup the needed plugins for Wordpress / WooCommerce Dev.",
+  "version": "1.0.0",
+  "keywords": [
+    "package",
+    "dependency",
+    "autoload"
+  ],
+  "homepage": "https://eny.tech/",
+  "license": "GPL-3.0-or-later",
+  "authors": [
+    {
+      "name": "Geoff DeFilipii",
+      "email": "geoff@eny.tech",
+      "role": "Developer"
     }
+  ],
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://wpackagist.org",
+      "only": [
+        "wpackagist-plugin/*",
+        "wpackagist-theme/*"
+      ]
+    }
+  ],
+  "config": {
+    "allow-plugins": {
+      "composer/installers": true
+    }
+  },
+  "require": {
+    "php": "^8.0",
+    "wpackagist-plugin/woocommerce": ">=7.1.0",
+    "wpackagist-plugin/formidable": ">=5.5.4"
+  },
+  "extra": {
+    "installer-paths": {
+      "wp-content/plugins/{$name}/": [
+        "type:wordress-plugin"
+      ]
+    }
+  },
+  "support": {
+    "issues": "https://eny.tech/wordpress/issues"
+  }
 }

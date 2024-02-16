@@ -38,8 +38,14 @@ services:
       WORDPRESS_TABLE_PREFIX: $WP_DB_PREFIX
       WORDPRESS_DEBUG: 1
 
+      WORDPRESS_CONFIG_EXTRA: |
+        if(!defined('WP_DEBUG_LOG')) {
+          define('WP_DEBUG_LOG', true);
+        }
     volumes:
-      - /var/git/repo/eny-events-schema:/var/www/html/wp-content/plugins/eny-events-schema
+      - /var/git/repo/eny-register:/var/www/html/wp-content/plugins/eny-register
+      - /var/git/repo/wp-graphql:/var/www/html/wp-content/plugins/wp-graphql
+      # - /var/git/repo/eny-events-schema:/var/www/html/wp-content/plugins/eny-events-schema
       - /var/git/repo/cabov2:/var/www/html/wp-content/reactpress/apps/cabov2
       - ./wp/composer.json:/var/www/html/composer.json
       - ./wordpress:/var/www/html

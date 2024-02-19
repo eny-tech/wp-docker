@@ -3,6 +3,7 @@ version: "3"
 
 services:
   # Ref: https://github.com/kassambara/wordpress-docker-compose/blob/master/docker-compose.yml
+  # Ref: https://stackoverflow.com/questions/73109392/enabling-wordpress-debug-mode-in-docker-compose-environment
 
   # WP Dev Container [build]
   wordpress:
@@ -20,7 +21,7 @@ services:
 
     #    command: sh -c "composer install"
 
-    image: wp_dev:2.0.0
+    image: wp_dev:latest
     container_name: wp-dev
 
     user: "1000:1000"
@@ -31,27 +32,60 @@ services:
       - "80:80"
 
     environment:
+      # debug mode
+      WORDPRESS_DEBUG: 1
+
+      # docker wp config settings
       WORDPRESS_DB_HOST: mariadb:3306
       WORDPRESS_DB_NAME: $DB_NAME
       WORDPRESS_DB_USER: $DB_USER
       WORDPRESS_DB_PASSWORD: $DB_PASS
       WORDPRESS_TABLE_PREFIX: $WP_DB_PREFIX
-      WORDPRESS_DEBUG: 1
-
+      WORDPRESS_AUTH_KEY: 5f6ede1b94d25a2294e29eeba929a8c80a5ac0fb
+      WORDPRESS_SECURE_KEY: 5f6ede1b94d25a2294e29eeba929a8c80a5ac0fb
+      WORDPRESS_LOGGED_IN_KEY: 5f6ede1b94d25a2294e29eeba929a8c80a5ac0fb
+      WORDPRESS_NONCE_KEY: 5f6ede1b94d25a2294e29eeba929a8c80a5ac0fb
+      WORDPRESS_SECURE_AUTH_SALT: 5f6ede1b94d25a2294e29eeba929a8c80a5ac0fb
+      WORDPRESS_LOGGED_IN_SALT: 5f6ede1b94d25a2294e29eeba929a8c80a5ac0fb
+      WORDPRESS_NONCE_SALT: 5f6ede1b94d25a2294e29eeba929a8c80a5ac0fb
+      # our local dev environment
       WORDPRESS_CONFIG_EXTRA: |
-        if(!defined('WP_DEBUG_LOG')) {
-          define('WP_DEBUG_LOG', true);
+        /* development parameters */
+        define('WP_CACHE', false);
+        define('ENVIRONMENT', 'local');
+
+        /* do not re-define WP_DEBUG here or it will throw a blank error in the admin */
+        /* you can remove this entirely, this is just to show you what not to do */
+        //define('WP_DEBUG', true);
+
+        if (!defined('WP_HOME')) { 
+          /* force our home url */
+          define('WP_HOME', 'http://localhost');
+          define('WP_SITEURL', WP_HOME);
         }
     volumes:
-      - /var/git/repo/eny-register:/var/www/html/wp-content/plugins/eny-register
+      # Plugins
+      - /var/git/repo/eny-events-register:/var/www/html/wp-content/plugins/eny-events-register
       - /var/git/repo/wp-graphql:/var/www/html/wp-content/plugins/wp-graphql
       # - /var/git/repo/eny-events-schema:/var/www/html/wp-content/plugins/eny-events-schema
       - /var/git/repo/cabov2:/var/www/html/wp-content/reactpress/apps/cabov2
+      # Basic Composer file
       - ./wp/composer.json:/var/www/html/composer.json
+      # WordPress core
       - ./wordpress:/var/www/html
+      # Bypass to get to pages outside of wordpress (phpinfo, etc.)
+      - ./bypass:/var/www/html/bypass
+      # Logs
+      - ./logs:/tmp/logs
+      # Configs
+      - ./wp/php.conf.ini:/usr/local/etc/php/conf.d/php.ini
+      - ./wp/xdebug.conf.ini:/usr/local/etc/php/conf.d/99-xdebug.ini
 
     networks:
       - network-dev
+
+    extra_hosts:
+      - "host.docker.internal:10.10.10.1"
 
   mariadb:
     build:
@@ -63,7 +97,7 @@ services:
         GROUP_ID: $DB_USER_GID
         USER_PATH: $DB_USER_PATH
 
-    image: db-dev:2.0.0
+    image: db-dev:latest
     container_name: db-dev
 
     restart: unless-stopped
@@ -138,3 +172,8 @@ services:
 
 networks:
   network-dev:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.10.0/24
+          gateway: 10.10.10.1

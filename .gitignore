@@ -5,3 +5,6 @@ wordpress/*
 
 mysql/*
 !mysql/.keep
+
+logs/*
+!logs/.keep

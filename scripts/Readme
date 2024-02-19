@@ -1,0 +1,3 @@
+# Don't forget to set the property to allow root execution to prevent needing sudo
+# chmod +x restart-docker.sh
+# sudo chmod +s restart-docker.sh

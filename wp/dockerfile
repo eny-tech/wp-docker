@@ -3,36 +3,29 @@ FROM wordpress:latest
 
 USER root
 
-RUN apt-get update -y 
-RUN apt-get install -y curl make zip unzip
+RUN apt-get -y update && apt-get upgrade 
+RUN apt-get install -y curl make zip unzip dnsutils
+# RUN apt-get install -y php-curl php-xml php-zip php-mbstring 
+# RUN apt-get install -y composer
 
 RUN apt-get clean -y
-# RUN docker-php-ext-install php-curl
-# RUN docker-php-ext-install php-xml
-
-# RUN docker-php-ext-install php-zip
-# RUN docker-php-ext-install php-mbstring
-
-# Push PHP configuration
-# --chown=gedefili:gedefili ?
-COPY php.conf.ini /usr/local/etc/php/conf.d/php.ini
-#COPY composer.json /var/www/html/composer.json
 
 # XDebug (thinking abouty using apt-get over pecl)
 RUN pecl install xdebug 
 RUN docker-php-ext-enable xdebug
-COPY xdebug.conf.ini /usr/local/etc/php/conf.d/99-xdebug.ini
+RUN apt-get -y update && apt-get upgrade 
 
 # Composer Install (https://getcomposer.org/doc/00-intro.md#locally)
-COPY --from=composer/composer /usr/bin/composer /usr/bin/composer
-RUN composer self-update
+#COPY --from=composer/composer /usr/bin/composer /usr/bin/composer
+#RUN composer self-update
+#RUN apt-get install -y composer
 
 # Add global composer dir to path (installed phpunit from global)
 # should make this more universal by getting this path via composer and then adding it
-ENV PATH="${PATH}:/home/geoff/.composer/vendor/bin"
+#ENV PATH="${PATH}:/home/geoff/.composer/vendor/bin"
 
 # Install PHP Unit
-RUN composer global require --dev phpunit/phpunit:9.*
+#RUN composer global require --dev phpunit/phpunit:9.*
 
 RUN useradd -ms /bin/bash -u 1000 geoff
 RUN usermod -a -G root geoff

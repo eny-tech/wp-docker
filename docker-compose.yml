@@ -113,6 +113,7 @@ services:
 
     volumes:
       - ./mysql:/var/lib/mysql
+      - ./db/my.conf.ini:/etc/mysql/my.cnf
 
     networks:
       - network-dev

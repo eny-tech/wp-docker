@@ -3,7 +3,7 @@ echo "Set working directory"
 cd /var/git/repo/wp-docker
 
 # Stop and remove containers, networks, images, and volumes
-echo "Docker Down"
+echo "WP Down"
 docker compose down
 
 # Clean up the logs directory when going down

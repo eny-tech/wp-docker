@@ -4,7 +4,8 @@ FROM wordpress:latest
 USER root
 
 RUN apt-get -y update && apt-get upgrade 
-RUN apt-get install -y curl make zip unzip dnsutils
+RUN apt-get install -y curl make zip unzip dnsutils 
+# php-mysql
 # RUN apt-get install -y php-curl php-xml php-zip php-mbstring 
 # RUN apt-get install -y composer
 
@@ -29,4 +30,4 @@ RUN apt-get -y update && apt-get upgrade
 
 RUN useradd -ms /bin/bash -u 1000 geoff
 RUN usermod -a -G root geoff
-RUN chmod -R g+rw /var/www/html/wp-content
+RUN chmod -R g+rw /var/www/html/

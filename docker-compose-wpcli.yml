@@ -1,0 +1,128 @@
+version: "3"
+# https://docs.docker.com/compose/compose-file/compose-versioning/
+
+services:
+  # Ref: https://github.com/kassambara/wordpress-docker-compose/blob/master/docker-compose.yml
+  # Ref: https://stackoverflow.com/questions/73109392/enabling-wordpress-debug-mode-in-docker-compose-environment
+
+  # WP Dev Container [build]
+  wordpress:
+    depends_on:
+      - mariadb
+
+    build:
+      context: ./wp
+      dockerfile: dockerfile
+      args:
+        USER_NAME: $DB_USER
+        USER_ID: $DB_USER_UID
+        GROUP_ID: $DB_USER_GID
+        USER_PATH: $DB_USER_PATH
+
+    #    command: sh -c "composer install"
+
+    image: wp_dev:latest
+    container_name: wp-dev
+
+    user: "1000:1000"
+
+    restart: unless-stopped
+
+    ports:
+      - "80:80"
+
+    environment:
+      # debug mode
+      WORDPRESS_DEBUG: 1
+
+      # docker wp config settings
+      WORDPRESS_DB_HOST: mariadb:3306
+      WORDPRESS_DB_NAME: $DB_NAME
+      WORDPRESS_DB_USER: $DB_USER
+      WORDPRESS_DB_PASSWORD: $DB_PASS
+      WORDPRESS_TABLE_PREFIX: $WP_DB_PREFIX
+      WORDPRESS_AUTH_KEY: 5f6ede1b94d25a2294e29eeba929a8c80a5ac0fb
+      WORDPRESS_SECURE_KEY: 5f6ede1b94d25a2294e29eeba929a8c80a5ac0fb
+      WORDPRESS_LOGGED_IN_KEY: 5f6ede1b94d25a2294e29eeba929a8c80a5ac0fb
+      WORDPRESS_NONCE_KEY: 5f6ede1b94d25a2294e29eeba929a8c80a5ac0fb
+      WORDPRESS_SECURE_AUTH_SALT: 5f6ede1b94d25a2294e29eeba929a8c80a5ac0fb
+      WORDPRESS_LOGGED_IN_SALT: 5f6ede1b94d25a2294e29eeba929a8c80a5ac0fb
+      WORDPRESS_NONCE_SALT: 5f6ede1b94d25a2294e29eeba929a8c80a5ac0fb
+      # our local dev environment
+      WORDPRESS_CONFIG_EXTRA: |
+        /* development parameters */
+        define('WP_CACHE', false);
+        define('ENVIRONMENT', 'local');
+
+        /* do not re-define WP_DEBUG here or it will throw a blank error in the admin */
+        /* you can remove this entirely, this is just to show you what not to do */
+        //define('WP_DEBUG', true);
+
+        if (!defined('WP_HOME')) { 
+          /* force our home url */
+          define('WP_HOME', 'http://localhost');
+          define('WP_SITEURL', WP_HOME);
+        }
+    volumes:
+      # Plugins
+      - /var/git/repo/eny_events:/var/www/html/wp-content/plugins/eny-events
+      - /var/git/repo/eny-events-register:/var/www/html/wp-content/plugins/eny-events-register
+      - /var/git/repo/wp-graphql:/var/www/html/wp-content/plugins/wp-graphql
+      # - /var/git/repo/eny-events-schema:/var/www/html/wp-content/plugins/eny-events-schema
+      # - /var/git/repo/cabov2:/var/www/html/wp-content/reactpress/apps/cabov2
+      # Basic Composer file
+      - ./wp/composer.json:/var/www/html/composer.json
+      # WordPress core
+      - ./wordpress:/var/www/html
+      # Bypass to get to pages outside of wordpress (phpinfo, etc.)
+      - ./bypass:/var/www/html/bypass
+      # Logs
+      - ./logs:/tmp/logs
+      # Configs
+      - ./wp/php.conf.ini:/usr/local/etc/php/conf.d/php.ini
+      - ./wp/xdebug.conf.ini:/usr/local/etc/php/conf.d/99-xdebug.ini
+
+    networks:
+      - network-dev
+
+    extra_hosts:
+      - "host.docker.internal:10.10.10.1"
+
+  mariadb:
+    build:
+      context: ./db
+      dockerfile: dockerfile
+      args:
+        USER_NAME: $DB_USER
+        USER_ID: $DB_USER_UID
+        GROUP_ID: $DB_USER_GID
+        USER_PATH: $DB_USER_PATH
+
+    image: db-dev:latest
+    container_name: db-dev
+
+    restart: unless-stopped
+
+    ports:
+      - "3306:3306"
+
+    environment:
+      MYSQL_ROOT_PASSWORD: $ROOT_PASS
+      MYSQL_DATABASE: $DB_NAME
+      MYSQL_USER: $DB_USER
+      MYSQL_PASSWORD: $DB_PASS
+
+    volumes:
+      - ./mysql:/var/lib/mysql
+      - ./db/my.conf.ini:/etc/mysql/my.cnf
+
+    networks:
+      - network-dev
+
+networks:
+  network-dev:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.10.0/24
+          gateway: 10.10.10.1

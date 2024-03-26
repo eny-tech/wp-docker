@@ -11,4 +11,4 @@ echo "Cleanup logs"
 
 find logs -mindepth 1 ! -name '.keep' -exec rm -rf {} +
 
-echo "Cleanup completed."
+echo "Cleanup completed."| 
